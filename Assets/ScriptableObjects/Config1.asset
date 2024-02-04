@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30b1ab5014cb8754f9b5aa7b1424493c, type: 3}
+  m_Name: Config1
+  m_EditorClassIdentifier: 
+  weapons:
+  - name: Hand
+    prefab: {fileID: 4634058848279662857, guid: 713d7b4dd0cba8b4398b0d530df9bf63, type: 3}
+    baseDamage: 1
+    baseAttackSpeed: 1
+  upgrades:
+  - name: Test1
+    tooltip: Hi this is a tooltip
+    bloodCost: 100
+    eyeCost: 0
+    damageMultiplierIncrease: 0
+    changeWeapon: 0
+    weapon: 0
+    bloodLimitMultiplier: 0
+    attackSpeedMultiplier: 0

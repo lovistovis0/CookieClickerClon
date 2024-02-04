@@ -1,28 +1,29 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using TMPro;
 using System.IO;
 using UnityEngine;
-
 
 [Serializable]
 public class SaveData
 {
     public float blood;
+    public float damageMultiplier;
+    public float attackSpeedMultiplier;
     public int eyes;
     public int killed;
+    public int weapon;
+    public bool[] purchasedUpgrades;
+
+    public SaveData(bool[] _purchasedUpgrades)
+    {
+        purchasedUpgrades = _purchasedUpgrades;
+    }
 }
 
-
-public class GameManager : SingletonPersistent<MonoBehaviour>
+public class GameManager : SingletonPersistent<GameManager>
 {
-    [SerializeField] private TextMeshProUGUI eyesText;
-
     private string savePath;
-    private SaveData saveData;
-    
-    
+    public SaveData saveData;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -33,15 +34,12 @@ public class GameManager : SingletonPersistent<MonoBehaviour>
     // Update is called once per frame
     void Update()
     {
-        saveData.eyes += 1;
-        eyesText.text = saveData.eyes.ToString();
-
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             Quit();
         }
     }
-    
+
     private void Load()
     {
         if (File.Exists(savePath))
@@ -51,7 +49,7 @@ public class GameManager : SingletonPersistent<MonoBehaviour>
         }
         else
         {
-            saveData = new SaveData();
+            saveData = new SaveData(new bool[ClickerManager.Instance.ConfigScriptableObject.upgrades.Length]);
         }
     }
 
