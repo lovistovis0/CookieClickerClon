@@ -75,6 +75,7 @@ public class ClickerManager : SingletonPersistent<ClickerManager>
     {
         NewEnemy();
         GetNames();
+        saveData.blood = 0;
     }
 
     // Update is called once per frame
@@ -125,7 +126,9 @@ public class ClickerManager : SingletonPersistent<ClickerManager>
         float newHealth = Mathf.Clamp(currentEnemyData.health, 0, currentEnemyData.totalHealth);
         
         // The actual inflicted damage is the gained blood
-        GainBlood(prevHealth- newHealth);
+        GainBlood(prevHealth - newHealth);
+        
+        Debug.Log(currentEnemyData.health);
         
         if (currentEnemyData.health <= 0)
         {
