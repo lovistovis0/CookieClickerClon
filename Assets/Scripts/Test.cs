@@ -1,4 +1,4 @@
-using System.Collections;
+/*using System.Collections;
 using System.Collections.Generic;
 using BreakEternity;
 using UnityEngine;
@@ -20,3 +20,4 @@ public class Test : MonoBehaviour
         Debug.Log(mogos);
     }
 }
+*/
