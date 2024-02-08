@@ -3,6 +3,7 @@ using System.IO;
 using UnityEngine;
 using System;
 using System.Collections;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
@@ -21,6 +22,10 @@ public class SaveData
     public int eyes;
     public int killed;
     public int weapon;
+
+    public int damageUpgradesAmount;
+    public int bloodLimitUpgradesAmount;
+    
     public bool[] purchasedUpgrades;
 
     public SaveData(bool[] _purchasedUpgrades)
@@ -60,7 +65,14 @@ public class ClickerManager : SingletonPersistent<ClickerManager>
     [SerializeField] private TextMeshProUGUI eyesText;
     [SerializeField] private TextMeshProUGUI killedText;
     [SerializeField] private TextMeshProUGUI signText;
-    
+    [SerializeField] private TextMeshProUGUI enemyHealthText;
+    [SerializeField] private TextMeshProUGUI damageIncreaseCostText;
+    [FormerlySerializedAs("maxBloodIncreaseCostText")] [SerializeField] private TextMeshProUGUI bloodLimitIncreaseCostText;
+    [SerializeField] private Image damageUpgradeButtonImage;
+    [SerializeField] private Image bloodLimitUpgradeButtonImage;
+    [SerializeField] private Button damageUpgradeButton;
+    [SerializeField] private Button bloodLimitUpgradeButton;
+
     // Properties
     public ConfigScriptableObject ConfigScriptableObject
     {
@@ -77,9 +89,10 @@ public class ClickerManager : SingletonPersistent<ClickerManager>
     // Start is called before the first frame update
     void Start()
     {
-        NewEnemy();
         GetNames();
-        saveData.blood = 0;
+        NewEnemy();
+
+        saveData = new SaveData(new bool[] {});
 
         currentEnemy = GameObject.FindGameObjectWithTag("Enemy");
     }
@@ -90,7 +103,21 @@ public class ClickerManager : SingletonPersistent<ClickerManager>
         bloodText.text = saveData.blood + " / " +
                          baseBloodLimit * saveData.bloodLimitMultiplier;
         eyesText.text = saveData.eyes.ToString();
-        killedText.text = saveData.eyes.ToString();
+        killedText.text = saveData.killed.ToString();
+
+        damageIncreaseCostText.text = DamageIncreaseCost().ToString();
+        bloodLimitIncreaseCostText.text = BloodLimitIncreaseCost().ToString();
+
+        enemyHealthText.text = currentEnemyData.health.ToString("#.00") + " / " + currentEnemyData.totalHealth.ToString("#.00");
+
+        bool affordDamageUpgrade = saveData.blood >= DamageIncreaseCost();
+        bool affordBloodLimitUpgrade = saveData.eyes >= BloodLimitIncreaseCost();
+
+        damageUpgradeButton.enabled = affordDamageUpgrade;
+        bloodLimitUpgradeButton.enabled = affordBloodLimitUpgrade;
+
+        damageUpgradeButtonImage.color = affordDamageUpgrade ? Color.white : Color.gray;
+        bloodLimitUpgradeButtonImage.color = affordBloodLimitUpgrade ? Color.white : Color.gray;
     }
     
     public void InitSaveData()
@@ -110,10 +137,13 @@ public class ClickerManager : SingletonPersistent<ClickerManager>
     private void NewEnemy()
     {
         saveData.killed++;
+        
+        // Sign stuff
+        signText.text = RandomName();
+        
+        float totalHealth = CalculateEnemyHealth(saveData.killed);
 
-        float maxHealth = CalculateEnemyHealth(saveData.killed);
-
-        currentEnemyData = new EnemyData(maxHealth);
+        currentEnemyData = new EnemyData(totalHealth);
     }
 
     public void Damage()
@@ -128,6 +158,7 @@ public class ClickerManager : SingletonPersistent<ClickerManager>
         currentEnemyData.health -= damage;
 
         float newHealth = Mathf.Clamp(currentEnemyData.health, 0, currentEnemyData.totalHealth);
+        currentEnemyData.health = newHealth;
         
         // The actual inflicted damage is the gained blood
         GainBlood(prevHealth - newHealth);
@@ -155,10 +186,7 @@ public class ClickerManager : SingletonPersistent<ClickerManager>
         }
         
         enemyTransform.position = oldPos;
-            
-        // Sign stuff
-        signText.text = RandomName();
-        
+
         NewEnemy();
         
         for (int frame = 0; frame < 60; frame++)
@@ -177,5 +205,32 @@ public class ClickerManager : SingletonPersistent<ClickerManager>
     private float CalculateEnemyHealth(int killed)
     {
         return baseEnemyHealth + Mathf.Pow(enemyHealthIncrease, killed);
+    }
+
+    public void UpgradeDamage()
+    {
+        GainBlood(-DamageIncreaseCost());
+        
+        saveData.damageMultiplier += 0.5f;
+        saveData.damageUpgradesAmount++;
+    }
+    
+    public void UpgradeBloodLimit()
+    {
+        saveData.eyes -= BloodLimitIncreaseCost();
+        
+        saveData.bloodLimitMultiplier += 0.25f;
+        saveData.bloodLimitUpgradesAmount++;
+    }
+
+    private float DamageIncreaseCost()
+    {
+        return 50 * Mathf.Pow(1.25f, saveData.damageUpgradesAmount);
+    }
+    
+    private int BloodLimitIncreaseCost()
+    {
+        float value = 5 * Mathf.Pow(1.5f, saveData.bloodLimitUpgradesAmount);
+        return (int)Mathf.Floor(value);
     }
 }
