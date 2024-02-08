@@ -2,6 +2,8 @@ using TMPro;
 using System.IO;
 using UnityEngine;
 using System;
+using System.Collections;
+using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 public class Names
@@ -56,6 +58,8 @@ public class ClickerManager : SingletonPersistent<ClickerManager>
     [Header("References")]
     [SerializeField] private TextMeshProUGUI bloodText;
     [SerializeField] private TextMeshProUGUI eyesText;
+    [SerializeField] private TextMeshProUGUI killedText;
+    [SerializeField] private TextMeshProUGUI signText;
     
     // Properties
     public ConfigScriptableObject ConfigScriptableObject
@@ -76,6 +80,8 @@ public class ClickerManager : SingletonPersistent<ClickerManager>
         NewEnemy();
         GetNames();
         saveData.blood = 0;
+
+        currentEnemy = GameObject.FindGameObjectWithTag("Enemy");
     }
 
     // Update is called once per frame
@@ -83,6 +89,7 @@ public class ClickerManager : SingletonPersistent<ClickerManager>
     {
         bloodText.text = saveData.blood.ToString();
         eyesText.text = saveData.eyes.ToString();
+        killedText.text = saveData.eyes.ToString();
     }
     
     public void InitSaveData()
@@ -101,14 +108,10 @@ public class ClickerManager : SingletonPersistent<ClickerManager>
 
     private void NewEnemy()
     {
-        // Actually spawn a prefab
-        
-        // The sign stuff
-        
-        
-        // Internal
+        saveData.killed++;
+
         float maxHealth = CalculateEnemyHealth(saveData.killed);
-        
+
         currentEnemyData = new EnemyData(maxHealth);
     }
 
@@ -133,10 +136,35 @@ public class ClickerManager : SingletonPersistent<ClickerManager>
         if (currentEnemyData.health <= 0)
         {
             // TODO: Kill the enemy
+            StartCoroutine(EnemyDeath());
+        }
+    }
+
+    IEnumerator EnemyDeath()
+    {
+        RectTransform enemyTransform = currentEnemy.GetComponent<RectTransform>();
+        Image enemyImage = currentEnemy.GetComponent<Image>();
+        
+        Vector3 oldPos = enemyTransform.position;
+        for (int frame = 0; frame < 100; frame++)
+        {
+            Debug.Log(enemyTransform.position.y);
+            enemyTransform.position = oldPos - new Vector3(0, Mathf.Sin(frame/60f) * 1000, 0);
+            yield return null;
+        }
+        
+        enemyTransform.position = oldPos;
             
-            // Sign stuff
-            
-            NewEnemy();
+        // Sign stuff
+        signText.text = RandomName();
+        
+        NewEnemy();
+        
+        for (int frame = 0; frame < 60; frame++)
+        {
+            enemyImage.color = new Color(enemyImage.color.r, enemyImage.color.g, enemyImage.color.b,
+                Mathf.Sin((frame/60f) * (Mathf.PI / 2f)));
+            yield return null;
         }
     }
 
