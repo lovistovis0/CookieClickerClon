@@ -87,7 +87,8 @@ public class ClickerManager : SingletonPersistent<ClickerManager>
     // Update is called once per frame
     void Update()
     {
-        bloodText.text = saveData.blood.ToString();
+        bloodText.text = saveData.blood + " / " +
+                         baseBloodLimit * saveData.bloodLimitMultiplier;
         eyesText.text = saveData.eyes.ToString();
         killedText.text = saveData.eyes.ToString();
     }
