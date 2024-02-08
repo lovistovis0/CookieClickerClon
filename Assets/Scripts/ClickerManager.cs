@@ -67,6 +67,7 @@ public class ClickerManager : SingletonPersistent<ClickerManager>
     [SerializeField] private TextMeshProUGUI eyesText;
     [SerializeField] private TextMeshProUGUI killedText;
     [SerializeField] private TextMeshProUGUI signText;
+    [SerializeField] private TextMeshProUGUI damageText;
     [SerializeField] private TextMeshProUGUI enemyHealthText;
     [SerializeField] private TextMeshProUGUI damageIncreaseCostText;
     [FormerlySerializedAs("maxBloodIncreaseCostText")] [SerializeField] private TextMeshProUGUI bloodLimitIncreaseCostText;
@@ -98,13 +99,16 @@ public class ClickerManager : SingletonPersistent<ClickerManager>
     // Update is called once per frame
     void Update()
     {
-        bloodText.text = saveData.blood + " / " +
-                         baseBloodLimit * saveData.bloodLimitMultiplier;
+        bloodText.text = (saveData.blood).ToString("#.00") + " / " +
+                         (baseBloodLimit * saveData.bloodLimitMultiplier).ToString("#.00");
         eyesText.text = saveData.eyes.ToString();
         killedText.text = saveData.killed.ToString();
 
-        damageIncreaseCostText.text = DamageIncreaseCost().ToString();
-        bloodLimitIncreaseCostText.text = BloodLimitIncreaseCost().ToString();
+        damageIncreaseCostText.text = DamageIncreaseCost().ToString("#.00");
+        bloodLimitIncreaseCostText.text = BloodLimitIncreaseCost().ToString("#.00");
+
+        damageText.text = (configScriptableObject.weapons[saveData.weapon].baseDamage * saveData.damageMultiplier)
+            .ToString();
 
         enemyHealthText.text = currentEnemyData.health.ToString("#.00") + " / " + currentEnemyData.totalHealth.ToString("#.00");
 
@@ -234,12 +238,12 @@ public class ClickerManager : SingletonPersistent<ClickerManager>
 
     private float DamageIncreaseCost()
     {
-        return 50 * Mathf.Pow(1.1f, saveData.damageUpgradesAmount);
+        return 50 * Mathf.Pow(1.04f, saveData.damageUpgradesAmount);
     }
     
     private int BloodLimitIncreaseCost()
     {
-        float value = 5 * Mathf.Pow(1.5f, saveData.bloodLimitUpgradesAmount);
+        float value = 5 * Mathf.Pow(1.1f, saveData.bloodLimitUpgradesAmount);
         return (int)Mathf.Floor(value);
     }
 }
