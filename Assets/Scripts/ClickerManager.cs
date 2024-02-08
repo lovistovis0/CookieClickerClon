@@ -92,6 +92,7 @@ public class ClickerManager : SingletonPersistent<ClickerManager>
     {
         GetNames();
         NewEnemy();
+        UpdateFilling();
     }
 
     // Update is called once per frame
@@ -202,6 +203,12 @@ public class ClickerManager : SingletonPersistent<ClickerManager>
     private void GainBlood(float amount)
     {
         saveData.blood = Mathf.Clamp(saveData.blood + amount, 0, baseBloodLimit * saveData.bloodLimitMultiplier);
+        UpdateFilling();
+    }
+
+    private void UpdateFilling()
+    {
+        BloodSea.Instance.filledAmount = saveData.blood / (baseBloodLimit * saveData.bloodLimitMultiplier);
     }
 
     private float CalculateEnemyHealth(int killed)

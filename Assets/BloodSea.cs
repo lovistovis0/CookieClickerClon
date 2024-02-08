@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class BloodSea : MonoBehaviour
+public class BloodSea : SingletonPersistent<BloodSea>
 {
     [SerializeField] Transform particles1;
     [SerializeField] Transform particles2;
