@@ -1552,6 +1552,8 @@ MonoBehaviour:
   enemyHealthIncrease: 1.1
   namesJson: {fileID: 4900000, guid: 86172a639a3e7fc49b2b371ef182007f, type: 3}
   configScriptableObject: {fileID: 11400000, guid: 17e4ed49677407949b4ee64720ccc5c5, type: 2}
+  enemy: {fileID: 1992062980}
+  enemyEye: {fileID: 1992072513}
   bloodText: {fileID: 1307341439}
   eyesText: {fileID: 1703688044}
   killedText: {fileID: 465989702}

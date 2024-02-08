@@ -59,8 +59,10 @@ public class ClickerManager : SingletonPersistent<ClickerManager>
 
     [Header("ScriptableObjects")]
     [SerializeField] private ConfigScriptableObject configScriptableObject;
-    
+
     [Header("References")]
+    [SerializeField] private GameObject enemy;
+    [SerializeField] private GameObject enemyEye;
     [SerializeField] private TextMeshProUGUI bloodText;
     [SerializeField] private TextMeshProUGUI eyesText;
     [SerializeField] private TextMeshProUGUI killedText;
@@ -82,7 +84,6 @@ public class ClickerManager : SingletonPersistent<ClickerManager>
     
     // Private variables
     private EnemyData currentEnemyData;
-    private GameObject currentEnemy;
     public SaveData saveData;
     private string[] names;
 
@@ -91,10 +92,6 @@ public class ClickerManager : SingletonPersistent<ClickerManager>
     {
         GetNames();
         NewEnemy();
-
-        saveData = new SaveData(new bool[] {});
-
-        currentEnemy = GameObject.FindGameObjectWithTag("Enemy");
     }
 
     // Update is called once per frame
@@ -136,8 +133,6 @@ public class ClickerManager : SingletonPersistent<ClickerManager>
 
     private void NewEnemy()
     {
-        saveData.killed++;
-        
         // Sign stuff
         signText.text = RandomName();
         
@@ -174,8 +169,9 @@ public class ClickerManager : SingletonPersistent<ClickerManager>
 
     IEnumerator EnemyDeath()
     {
-        RectTransform enemyTransform = currentEnemy.GetComponent<RectTransform>();
-        Image enemyImage = currentEnemy.GetComponent<Image>();
+        RectTransform enemyTransform = enemy.GetComponent<RectTransform>();
+        Image enemyImage = enemy.GetComponent<Image>();
+        Image enemyEyeImage = enemyEye.GetComponent<Image>();
         
         Vector3 oldPos = enemyTransform.position;
         for (int frame = 0; frame < 100; frame++)
@@ -186,13 +182,19 @@ public class ClickerManager : SingletonPersistent<ClickerManager>
         }
         
         enemyTransform.position = oldPos;
+        
+        saveData.killed++;
+        saveData.eyes++;
 
         NewEnemy();
         
         for (int frame = 0; frame < 60; frame++)
         {
-            enemyImage.color = new Color(enemyImage.color.r, enemyImage.color.g, enemyImage.color.b,
+            Color color = new Color(enemyImage.color.r, enemyImage.color.g, enemyImage.color.b,
                 Mathf.Sin((frame/60f) * (Mathf.PI / 2f)));
+            
+            enemyImage.color = color;
+            enemyEyeImage.color = color;
             yield return null;
         }
     }
@@ -225,7 +227,7 @@ public class ClickerManager : SingletonPersistent<ClickerManager>
 
     private float DamageIncreaseCost()
     {
-        return 50 * Mathf.Pow(1.25f, saveData.damageUpgradesAmount);
+        return 50 * Mathf.Pow(1.1f, saveData.damageUpgradesAmount);
     }
     
     private int BloodLimitIncreaseCost()
