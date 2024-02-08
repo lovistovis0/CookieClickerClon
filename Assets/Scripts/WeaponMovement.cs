@@ -32,6 +32,6 @@ public class WeaponMovement : MonoBehaviour
         
         float angle = Random.Range(0f, Mathf.PI*2);
         Vector2 jitter = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * jitterStrength;
-        transform.position = mainCamera.ScreenToWorldPoint(Input.mousePosition) + (Vector3)jitter;
+        transform.position = Input.mousePosition + (Vector3)jitter;
     }
 }
